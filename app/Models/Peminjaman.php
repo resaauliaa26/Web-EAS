@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Peminjaman extends Model
 {
-    // ⬅️ INI YANG PALING PENTING
+    use HasFactory;
+
+    // 🔥 PENTING: paksa nama tabel
     protected $table = 'peminjamans';
 
     protected $fillable = [
@@ -15,7 +18,7 @@ class Peminjaman extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'status',
-        'catatan',
+        // ❌ JANGAN pakai catatan kalau kolom belum ada
     ];
 
     public function user()

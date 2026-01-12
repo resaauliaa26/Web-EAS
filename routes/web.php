@@ -6,7 +6,6 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\UserDashboard\UserDashboardController;
 use App\Http\Controllers\AdminDashboard\AdminDashboardController;
-use App\Http\Controllers\VehiclesController;
 use App\Http\Controllers\PeminjamanController;
 
 /*
@@ -20,9 +19,18 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| ROUTE PENJEMBATAN (ANTI KLIK 2x LOGIN)
+|--------------------------------------------------------------------------
+*/
+Route::get('/go-login', function () {
+    return redirect()->route('login');
+})->name('go.login');
+
+/*
+|--------------------------------------------------------------------------
 | AUTH (GUEST)
 |--------------------------------------------------------------------------
-| ⚠️ WAJIB: route login bernama "login"
+| ⚠️ route login WAJIB bernama "login"
 */
 Route::middleware('guest')->group(function () {
 
@@ -39,13 +47,6 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/register', [RegisterController::class, 'save'])
         ->name('register.store');
-
-    // ALIAS (opsional, aman)
-    Route::get('/auth-login', fn () => redirect()->route('login'))
-        ->name('auth.login');
-
-    Route::get('/auth-register', fn () => redirect()->route('register'))
-        ->name('auth.register');
 });
 
 /*
@@ -92,9 +93,6 @@ Route::middleware(['auth', 'admin'])
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
-
-        // Kelola Ruangan / Inventaris
-        Route::resource('vehicles', VehiclesController::class);
 
         // Kelola Peminjaman
         Route::get('/peminjaman', [PeminjamanController::class, 'index'])
