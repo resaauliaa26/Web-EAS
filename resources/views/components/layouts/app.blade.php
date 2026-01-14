@@ -13,8 +13,11 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Styles & Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- ✅ CSS STATIC (WAJIB UNTUK RAILWAY / PRODUCTION) -->
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+    <!-- ✅ JS TETAP VIA VITE -->
+    @vite(['resources/js/app.js'])
 
     <!-- External Libraries -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
