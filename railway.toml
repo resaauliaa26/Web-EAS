@@ -2,8 +2,6 @@
 builder = "nixpacks"
 buildCommand = """
   composer install --no-dev --no-scripts && 
-  rm -f package-lock.json && 
-  npm cache clean --force && 
-  npm ci --legacy-peer-deps && 
-  npm run build
+  npm ci --omit=dev && 
+  npm run build:css
 """
