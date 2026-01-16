@@ -14,7 +14,7 @@ use App\Http\Controllers\PeminjamanController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('index');
+    return view('home-orange'); // GANTI INI dengan file view baru
 })->name('home');
 
 /*
@@ -116,9 +116,10 @@ Route::middleware(['auth', 'admin'])
 Route::get('/health', function() {
     return response()->json([
         'status' => 'ok',
-        'app' => config('app.name'),
-        'env' => config('app.env'),
-        'time' => now()->format('Y-m-d H:i:s')
+        'app' => config('app.name', 'Sistem Peminjaman ITENAS'),
+        'env' => config('app.env', 'production'),
+        'time' => now()->format('Y-m-d H:i:s'),
+        'url' => config('app.url', 'https://web-eas-production.up.railway.app')
     ]);
 })->name('health.check');
 
@@ -154,31 +155,55 @@ Route::get('/.well-known/security.txt', function() {
     ]);
 });
 
-// Fix untuk asset testing (optional, bisa dihapus setelah deploy sukses)
-Route::get('/test-assets', function() {
-    echo "<h1>Asset Test Page</h1>";
-    echo "<p>Checking if assets are loading correctly...</p>";
-    
-    // Test CSS
-    echo "<style>.test-css { color: green; font-weight: bold; }</style>";
-    echo "<p class='test-css'>✅ CSS is working</p>";
-    
-    // Test image
-    $images = [
-        '/assets/images/landingpage/unggul.png',
-        '/assets/images/landingpage/itenas.jpg',
-        '/assets/images/landingpage/sc.png'
-    ];
-    
-    foreach ($images as $image) {
-        if (file_exists(public_path($image))) {
-            echo "<p>✅ Image exists: $image</p>";
-        } else {
-            echo "<p style='color: red;'>❌ Image missing: $image</p>";
-        }
+// Route untuk clear cache (penting untuk deployment)
+Route::get('/clear-cache', function() {
+    if (app()->environment('production')) {
+        return response('Cache clear disabled in production', 403);
     }
     
-    echo "<hr><p>Current URL: " . url()->current() . "</p>";
-    echo "<p>APP_URL: " . config('app.url') . "</p>";
-    echo "<p>Environment: " . app()->environment() . "</p>";
-})->name('test.assets');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    
+    return "Cache cleared successfully! <a href='/'>Back to Home</a>";
+})->name('clear.cache');
+
+// Route untuk test environment
+Route::get('/env-test', function() {
+    return response()->json([
+        'app_name' => config('app.name'),
+        'app_env' => config('app.env'),
+        'app_debug' => config('app.debug'),
+        'app_url' => config('app.url'),
+        'asset_url' => config('app.asset_url'),
+        'timezone' => config('app.timezone'),
+        'db_connection' => config('database.default'),
+    ]);
+});
+
+// Fallback route untuk asset yang tidak ditemukan
+Route::get('/assets/{any}', function($any) {
+    $path = public_path("assets/{$any}");
+    if (file_exists($path)) {
+        return response()->file($path);
+    }
+    return response()->json(['error' => 'Asset not found'], 404);
+})->where('any', '.*');
+
+// Fallback untuk build assets (jika menggunakan Vite)
+Route::get('/build/{any}', function($any) {
+    $path = public_path("build/{$any}");
+    if (file_exists($path)) {
+        return response()->file($path);
+    }
+    return response()->json(['error' => 'Build asset not found'], 404);
+})->where('any', '.*');
+
+// Route untuk testing view baru
+Route::get('/test-view', function() {
+    if (view()->exists('home-orange')) {
+        return view('home-orange');
+    }
+    return "View 'home-orange' not found. Creating fallback view...";
+});
