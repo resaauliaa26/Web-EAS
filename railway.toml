@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "composer install --no-dev --no-scripts && npm install --production && npx tailwindcss -i resources/css/app.css -o public/css/app.css --minify"
+buildCommand = "composer install --no-dev --no-scripts"
 
 [start]
 cmd = "php artisan serve --host=0.0.0.0 --port=${PORT}"
